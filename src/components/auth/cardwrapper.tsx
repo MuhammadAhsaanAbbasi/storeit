@@ -8,19 +8,21 @@ interface CardwrapperProps {
     headerlabels: string;
     backButtonLabel: string;
     backButtonhref: string;
+    hrefText: string;
 }
 
 
 export const CardWrapper = (
     {
-        children,
         headerlabels,
         backButtonLabel,
-        backButtonhref
+        backButtonhref,
+        hrefText,
+        children
     }: CardwrapperProps
 ) => {
     return (
-        <Card className='w-[400px] shadow-md bg-[#1C1F2E] backdrop-blur-md rounded-xl border border-[#0E78F9] text-[#fff] h-full font-'>
+        <Card className='w-full border-none shadow-none'>
             <CardHeader>
                 <AuthHeader label={headerlabels} />
             </CardHeader>
@@ -28,7 +30,7 @@ export const CardWrapper = (
                 {children}
             </CardContent>
             <CardFooter>
-                <BackButton label={backButtonLabel} href={backButtonhref} />
+                <BackButton label={backButtonLabel} href={backButtonhref} text={hrefText} />
             </CardFooter>
         </Card>
     )

@@ -5,25 +5,29 @@ import Link from 'next/link'
 
 interface BackButtonProps {
     label: string,
-    href: string
+    href: string,
+    text: string
 }
 
 
 const BackButton = (
     {
         label,
-        href
+        href,
+        text
     }: BackButtonProps
 ) => {
     return (
         <Button
-        variant={"link"}
-        className='w-full font-normal text-base hover:underline'
+        className='w-full font-normal text-base hover:bg-transparent'
+        variant={"ghost"}
         size={"sm"}
-        asChild
         >
-            <Link href={href}>
+            <span>
                 {label}
+            </span>
+            <Link href={href} className='text-red hover:underline'>
+                {text}
             </Link>
         </Button>
     )
