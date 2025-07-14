@@ -87,19 +87,21 @@ export const SignUpForm = () => {
                         name="username"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>
-                                    UserName
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...field}
-                                        disabled={isPending}
-                                        placeholder='johndoe'
-                                        type="text"
-                                        className='auth_input'
-                                    />
-                                </FormControl>
-                                <FormMessage />
+                                <div className="shad-form-item">
+                                    <FormLabel className="shad-form-label">
+                                        UserName
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            disabled={isPending}
+                                            placeholder='johndoe'
+                                            type="text"
+                                            className="shad-input"
+                                        />
+                                    </FormControl>
+                                </div>
+                                <FormMessage className="shad-form-message" />
                             </FormItem>
                         )}
                     />
@@ -108,19 +110,21 @@ export const SignUpForm = () => {
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>
-                                    Email
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...field}
-                                        disabled={isPending}
-                                        placeholder='johndoe@gmail.com'
-                                        type="email"
-                                        className='auth_input'
-                                    />
-                                </FormControl>
-                                <FormMessage />
+                                <div className="shad-form-item">
+                                    <FormLabel className="shad-form-label">
+                                        Email
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            disabled={isPending}
+                                            placeholder='johndoe@gmail.com'
+                                            type="email"
+                                            className="shad-input"
+                                        />
+                                    </FormControl>
+                                </div>
+                                <FormMessage className="shad-form-message" />
                             </FormItem>
                         )}
                     />
@@ -129,19 +133,21 @@ export const SignUpForm = () => {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>
-                                    Password
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...field}
-                                        disabled={isPending}
-                                        placeholder='*********'
-                                        type='password'
-                                        className='auth_input'
-                                    />
-                                </FormControl>
-                                <FormMessage />
+                                <div className="shad-form-item">
+                                    <FormLabel className="shad-form-label">
+                                        Password
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            disabled={isPending}
+                                            placeholder='*********'
+                                            type='password'
+                                            className="shad-input"
+                                        />
+                                    </FormControl>
+                                </div>
+                                <FormMessage className="shad-form-message" />
                             </FormItem>
                         )}
                     />
