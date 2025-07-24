@@ -2,7 +2,6 @@
 import React, { useState, useTransition } from 'react'
 import { CardWrapper } from './cardwrapper';
 import { Form, FormProvider, useForm } from 'react-hook-form';
-import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { cn } from '@/lib/utils';
 import { z } from 'zod';
@@ -13,9 +12,9 @@ import { useRouter } from 'next/navigation';
 import { ToastAction } from '../ui/toast';
 import { FormError } from '@/components/shared/FormError';
 import { FormSuccess } from '@/components/shared/FormSucess';
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
-import SocialAuth from './socialauth';
+// import { FcGoogle } from "react-icons/fc";
+// import { FaGithub } from "react-icons/fa";
+// import SocialAuth from './socialauth';
 import { toast } from '@/hooks/use-toast';
 import { RegisterSchema } from '@/schema/auth';
 // import { register } from '@/global-actions/auth';
@@ -74,7 +73,7 @@ export const SignUpForm = () => {
             {...form}
         >
             <CardWrapper
-                headerlabels='Sign Up'
+                headerlabels='Create Account'
                 backButtonLabel="Already Have an Account?"
                 backButtonhref='/sign-in'
                 hrefText='Sign in'
