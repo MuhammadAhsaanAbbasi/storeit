@@ -1,6 +1,90 @@
 "use server";
 import { appWriteConfig } from "@/lib/appwrite/config";
+import { RegisterSchema } from "@/schema/auth";
+import { z } from "zod";
+import { createAdminClient } from "../appwrite";
+import { Query, ID } from "node-appwrite";
+import { handleError } from "../utils";
+import { avatarPlaceholderUrl } from "@/constants";
 
-export const registerUser = async () => {
+const getUserByEmail = async (email: string) => {
+    const { databases } = await createAdminClient();
+
+    const result = await databases.listDocuments(
+        appWriteConfig.databaseID,
+        appWriteConfig.userCollectionID,
+        [Query.equal("email", email)],
+    );
+
+    return result.total > 0 ? result.documents[0] : null;
+};
+
+const sendEmailOTP = async (email: string) => {
+    const { account } = await createAdminClient();
     
+    try {
+        const session = await account.createEmailToken(ID.unique(), email);
+        return session.userId;
+    } catch (error) {
+        handleError(error, "Failed to send email OTP")
+    }
+}
+
+
+export const registerUser = async (values: z.infer<typeof RegisterSchema>) => {
+    const isValidate = RegisterSchema.safeParse(values)
+
+    if (!isValidate.success) {
+        return {
+            error: isValidate.error.flatten().fieldErrors
+        }
+    }
+
+    const { username, email, password } = isValidate.data;
+
+    try {
+        const existing_user = await getUserByEmail(email);
+    
+        if (existing_user) {
+            return {
+                error: "User already exists"
+            }
+        }
+    
+        const accountId = await sendEmailOTP(email);
+    
+        if (!accountId) {
+            return {
+                error: "Failed to send email OTP"
+            }
+        }
+    
+        const { databases } = await createAdminClient();
+        await databases.createDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.userCollectionID,
+            ID.unique(),
+            {
+                fullName: username,
+                email: email,
+                password: password,
+                accountId,
+                avatar: avatarPlaceholderUrl
+            }
+        )
+        console.log(accountId);
+        return {
+            success: "User registered successfully",
+            data: {
+                accountId
+            }
+        }
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            return { error: "Invalid credentials!", message: error.message };
+        }
+        return { message: error }
+    }
+
 }

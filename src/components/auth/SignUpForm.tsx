@@ -17,6 +17,8 @@ import { FormSuccess } from '@/components/shared/FormSucess';
 // import SocialAuth from './socialauth';
 import { toast } from '@/hooks/use-toast';
 import { RegisterSchema } from '@/schema/auth';
+import { registerUser } from '@/lib/actions/user.actions';
+import { LoaderCircle } from 'lucide-react';
 // import { register } from '@/global-actions/auth';
 
 
@@ -24,7 +26,7 @@ export const SignUpForm = () => {
     const [error, setError] = useState<string | undefined>("")
     const [success, setSuccess] = useState<string | undefined>("")
     const [isPending, startTransition] = useTransition()
-    const router = useRouter()
+    // const router = useRouter();
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
@@ -35,36 +37,41 @@ export const SignUpForm = () => {
         }
     })
 
-    function onSubmit(values: z.infer<typeof RegisterSchema>) {
+    async function onSubmit(values: z.infer<typeof RegisterSchema>) {
         setError('')
         setSuccess('')
         startTransition(() => {
             console.log(values)
-            // register(values).then((data) => {
-            //     setError(data.error);
-            //     setSuccess(data.msg);
-            //     if (data?.error) {
-            //         form.reset();
-            //         toast({
-            //             title: "Signup Failed",
-            //             description: data?.error,
-            //             variant: "destructive",
-            //             duration: 2000,
-            //         })
-            //     }
-            //     if (data?.success) {
-            //         form.reset();
-            //         toast({
-            //             title: "Signup Success",
-            //             description: "Please Login To Continue",
-            //             duration: 2000,
-            //             action: (
-            //                 <ToastAction altText="Verify Your Account!">Verify Now!</ToastAction>
-            //             ),
-            //         });
-            //         router.push(`/auth/verify?token=${data.success}`)
-            //     }
-            // });
+            registerUser(values)
+            .then((data) => {
+                setError((data?.error as string));
+                setSuccess(data.success);
+                if (data?.error) {
+                    form.reset();
+                    toast({
+                        title: "Signup Failed",
+                        description: (data?.error as string),
+                        variant: "destructive",
+                        duration: 2000,
+                    })
+                }
+                if (data?.success) {
+                    form.reset();
+                    toast({
+                        title: "Signup Success",
+                        description: "Please Login To Continue",
+                        duration: 2000,
+                        action: (
+                            <ToastAction altText="Verify Your Account!">Verify Now!</ToastAction>
+                        ),
+                    });
+                    // router.push(`/auth/verify?token=${data.success}`)
+                }
+            }).catch((error) => {
+                console.log(error)
+            }).finally(() => {
+                form.reset();
+            })
         });
     }
 
@@ -155,9 +162,13 @@ export const SignUpForm = () => {
                     <FormSuccess message={success} />
 
                     <Button
-                        // disabled={isPending}
+                        disabled={isPending}
                         type="submit" className='primary-btn'>
-                        Create an Account
+                            {
+                                isPending ? 
+                                <LoaderCircle className='mr-2 h-4 w-4 animate-spin text-light-300' />
+                                : "Create an Account"
+                            }
                         <BottomGradient />
                     </Button>
 
