@@ -53,7 +53,6 @@ export const SignUpForm = () => {
                     setError((data?.error as string));
                     setSuccess(data?.success);
                     if (data?.error) {
-                        form.reset();
                         toast({
                             title: "Signup Failed",
                             description: (data?.error as string),
@@ -62,13 +61,12 @@ export const SignUpForm = () => {
                         })
                     }
                     if (data?.success) {
-                        form.reset();
                         toast({
                             title: "Signup Success",
-                            description: "Please Login To Continue",
+                            description: data.success,
                             duration: 2000,
                             action: (
-                                <ToastAction altText="Verify Your Account!">Verify Now!</ToastAction>
+                                <ToastAction altText="Verify Your Account!">Verify Account!</ToastAction>
                             ),
                         });
                         setAccountId(data.data.accountId);
@@ -81,10 +79,10 @@ export const SignUpForm = () => {
                     }
                 }).catch((error) => {
                     console.log(error)
+                })
+                .finally(() => {
+                    form.reset();
                 });
-            // .finally(() => {
-            //     form.reset();
-            // })
         });
     }
 
