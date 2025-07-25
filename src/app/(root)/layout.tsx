@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 const RootLayout = ({children}:{children: ReactNode}) => {
   return (
-    <main>
+    <main className='font-poppins'>
         {children}
     </main>
   )

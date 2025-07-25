@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const handleError = (error: unknown, message: string) => {
-  console.log(error, message);
-  throw error;
+  if (error instanceof Error) {
+    return { error: "Invalid credentials!", message: message };
+  }
+  return { message: error }
 };
+
+export const parseStringify = (value: unknown) =>
+  JSON.parse(JSON.stringify(value));

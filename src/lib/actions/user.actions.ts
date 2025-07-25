@@ -6,6 +6,7 @@ import { createAdminClient } from "../appwrite";
 import { Query, ID } from "node-appwrite";
 import { handleError } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
+import { cookies } from "next/headers";
 
 const getUserByEmail = async (email: string) => {
     const { databases } = await createAdminClient();
@@ -19,7 +20,7 @@ const getUserByEmail = async (email: string) => {
     return result.total > 0 ? result.documents[0] : null;
 };
 
-const sendEmailOTP = async (email: string) => {
+export const sendEmailOTP = async (email: string) => {
     const { account } = await createAdminClient();
     
     try {
@@ -81,10 +82,29 @@ export const registerUser = async (values: z.infer<typeof RegisterSchema>) => {
         }
         
     } catch (error) {
-        if (error instanceof Error) {
-            return { error: "Invalid credentials!", message: error.message };
-        }
-        return { message: error }
+        handleError(error, "Failed to register user")
     }
 
+}
+
+export const verifyEmailOTP = async (accountId: string, password: string) => {
+    const { account } = await createAdminClient();
+    
+    try {
+        const session = await account.createSession(accountId, password);
+        
+        (await cookies()).set("appwrite-session", session.secret, {
+            path: "/",
+            httpOnly: true,
+            sameSite: "strict",
+            maxAge: 60 * 60 * 24 * 7,
+            secure: true
+        });
+        return {
+            success: "OTP verified successfully",
+            data: session.$id
+        }
+    } catch (error) {
+        handleError(error, "Failed to verify email OTP")
+    }
 }
