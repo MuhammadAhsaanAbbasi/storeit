@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react'
 
-const SideBar = () => {
+const SideBar = ({fullName, email, avatar}: UserProfileProps) => {
   const pathname = usePathname();
   return (
     <aside className='sidebar'>
@@ -63,6 +63,35 @@ const SideBar = () => {
           }
         </ul>
       </nav>
+
+      {/* File Image */}
+      <Image
+        src={"/images/files-2.png"}
+        alt="files"
+        width={506}
+        height={418}
+        className='w-full h-auto'
+      />
+
+      {/* Account */}
+      <div className='sidebar-user-info'>
+        <Image 
+        src={avatar}
+        alt="avatar"
+        width={44}
+        height={44}
+        className='w-full h-auto'
+        />
+
+        <div className='hidden lg:block'>
+          <p className='subtitle-2 capitalize'>
+            {fullName}
+          </p>
+          <p className='caption'>
+            {email}
+          </p>
+        </div>
+      </div>
     </aside>
   )
 }

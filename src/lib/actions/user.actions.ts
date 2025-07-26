@@ -2,9 +2,9 @@
 import { appWriteConfig } from "@/lib/appwrite/config";
 import { RegisterSchema } from "@/schema/auth";
 import { z } from "zod";
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { Query, ID } from "node-appwrite";
-import { handleError } from "../utils";
+import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
 
@@ -108,3 +108,24 @@ export const verifyEmailOTP = async (accountId: string, password: string) => {
         handleError(error, "Failed to verify email OTP")
     }
 }
+
+
+export const getCurrentUser = async () => {
+    try {
+      const { databases, account } = await createSessionClient();
+  
+      const result = await account.get();
+  
+      const user = await databases.listDocuments(
+        appWriteConfig.databaseID,
+        appWriteConfig.userCollectionID,
+        [Query.equal("accountId", result.$id)],
+      );
+  
+      if (user.total <= 0) return null;
+  
+      return parseStringify(user.documents[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
