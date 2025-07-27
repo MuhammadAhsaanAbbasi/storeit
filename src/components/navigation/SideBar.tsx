@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react'
 
-const SideBar = ({fullName, email, avatar}: UserProfileProps) => {
+const SideBar = ({ fullName, email, avatar }: UserProfileProps) => {
   const pathname = usePathname();
   return (
     <aside className='sidebar'>
@@ -75,19 +75,21 @@ const SideBar = ({fullName, email, avatar}: UserProfileProps) => {
 
       {/* Account */}
       <div className='sidebar-user-info'>
-        <Image 
-        src={avatar}
-        alt="avatar"
-        width={44}
-        height={44}
-        className='w-full h-auto'
-        />
+        <div className="flex h-12 w-12 shrink-0 overflow-hidden rounded-full">
+          <Image
+            src={avatar}
+            alt={fullName}
+            height={54}
+            width={54}
+            className="aspect-square h-full w-full"
+          />
+        </div>
 
         <div className='hidden lg:block'>
-          <p className='subtitle-2 capitalize'>
+          <h5 className='h5 capitalize text-light-100'>
             {fullName}
-          </p>
-          <p className='caption'>
+          </h5>
+          <p className='caption text-light-200'>
             {email}
           </p>
         </div>

@@ -7,9 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export const handleError = (error: unknown, message: string) => {
   if (error instanceof Error) {
-    return { error: "Invalid credentials!", message: message };
+    return { error: error.message, message: message };
   }
-  return { message: error }
+  return { error: error }
 };
 
 export const parseStringify = (value: unknown) =>

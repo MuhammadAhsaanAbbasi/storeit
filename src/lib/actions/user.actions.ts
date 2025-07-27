@@ -7,6 +7,7 @@ import { Query, ID } from "node-appwrite";
 import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const getUserByEmail = async (email: string) => {
     const { databases } = await createAdminClient();
@@ -29,7 +30,7 @@ export const sendEmailOTP = async (email: string) => {
     } catch (error) {
         handleError(error, "Failed to send email OTP")
     }
-}
+};
 
 
 export const registerUser = async (values: z.infer<typeof RegisterSchema>) => {
@@ -85,7 +86,8 @@ export const registerUser = async (values: z.infer<typeof RegisterSchema>) => {
         handleError(error, "Failed to register user")
     }
 
-}
+};
+
 
 export const verifyEmailOTP = async (accountId: string, password: string) => {
     const { account } = await createAdminClient();
@@ -126,6 +128,21 @@ export const getCurrentUser = async () => {
   
       return parseStringify(user.documents[0]);
     } catch (error) {
-      console.log(error);
+      handleError(error, "Unable to load user Profile")
     }
   };
+
+
+export const signOut = async () => {
+    const { account } = await createSessionClient();
+    try {
+        await account.deleteSession("current");
+        (await cookies()).delete("appwrite-session");
+        
+        return {
+            success: "User signed out successfully"
+        }
+    } catch (error) {
+        handleError(error, "Failed to sign out user");
+    }
+}
