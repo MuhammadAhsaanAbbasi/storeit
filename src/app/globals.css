@@ -177,7 +177,7 @@
   }
 
   .shad-sheet {
-    @apply pt-0 !important;
+    @apply pt-0 flex flex-col justify-between space-y-4 !important;
   }
   .shad-sheet button,
   .shad-dialog button {
@@ -380,7 +380,7 @@
     @apply flex h-[60px] justify-between px-5 sm:hidden !important;
   }
   .header-user {
-    @apply my-3 flex items-center gap-2 rounded-full p-1 text-light-100 sm:justify-center sm:bg-brand/10 lg:justify-start lg:p-3 !important;
+    @apply my-3 flex items-center gap-4 rounded-full p-2 text-light-100 sm:justify-center bg-brand/10 lg:justify-start w-full !important;
   }
   .header-user-avatar {
     @apply aspect-square w-10 rounded-full object-cover !important;

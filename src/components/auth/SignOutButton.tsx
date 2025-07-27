@@ -20,20 +20,20 @@ const SignOutButton = () => {
                     });
                 }
             })
-            .catch((error) => {
-                toast({
-                    title: "SignOut Failed!!",
-                    description: error.message,
-                    variant: "destructive"
+                .catch((error) => {
+                    toast({
+                        title: "SignOut Failed!!",
+                        description: error.message,
+                        variant: "destructive"
+                    })
                 })
-            })
-            .finally(() => {
-                redirect("/sign-in");
-            });
+                .finally(() => {
+                    redirect("/sign-in");
+                });
         });
     }
     return (
-        <Button className='sign-out-button'
+        <Button className='max-sm:mobile-sign-out-button sm:sign-out-button'
             onClick={handleSignOut}
             disabled={isPending}
         >
@@ -44,6 +44,9 @@ const SignOutButton = () => {
                 height={24}
                 className='w-6'
             />
+            <span className='sm:hidden'>
+                Logout
+            </span>
         </Button>
     )
 }
