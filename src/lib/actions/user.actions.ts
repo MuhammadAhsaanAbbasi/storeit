@@ -1,6 +1,6 @@
 "use server";
 import { appWriteConfig } from "@/lib/appwrite/config";
-import { RegisterSchema } from "@/schema/auth";
+import { LoginSchema, RegisterSchema } from "@/schema/auth";
 import { z } from "zod";
 import { createAdminClient, createSessionClient } from "../appwrite";
 import { Query, ID } from "node-appwrite";
@@ -21,11 +21,11 @@ const getUserByEmail = async (email: string) => {
     return result.total > 0 ? result.documents[0] : null;
 };
 
-export const sendEmailOTP = async (email: string) => {
+export const sendEmailOTP = async (accountId: string, email: string) => {
     const { account } = await createAdminClient();
     
     try {
-        const session = await account.createEmailToken(ID.unique(), email);
+        const session = await account.createEmailToken(accountId, email);
         return session.userId;
     } catch (error) {
         handleError(error, "Failed to send email OTP")
@@ -51,9 +51,13 @@ export const registerUser = async (values: z.infer<typeof RegisterSchema>) => {
             return {
                 error: "User already exists"
             }
-        }
+        };
+
+        const { account } = await createAdminClient();
+
+        const user = await account.create(ID.unique(), email, password, username);
     
-        const accountId = await sendEmailOTP(email);
+        const accountId = await sendEmailOTP(user.$id, email);
     
         if (!accountId) {
             return {
@@ -144,5 +148,48 @@ export const signOut = async () => {
         }
     } catch (error) {
         handleError(error, "Failed to sign out user");
+    }
+}
+
+export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
+    const isValidate = LoginSchema.safeParse(values)
+
+    if (!isValidate.success) {
+        return {
+            error: isValidate.error.flatten().fieldErrors
+        }
+    }
+
+    const { email, password } = isValidate.data;
+    const { account } = await createAdminClient();
+    
+    try {
+        const existing_user = await getUserByEmail(email);
+        
+        if (!existing_user) {
+            return {
+                error: "User not found"
+            }
+        }
+        
+        const session = await account.createEmailPasswordSession(email, password);
+        
+        (await cookies()).set("appwrite-session", session.secret, {
+            path: "/",
+            httpOnly: true,
+            sameSite: "strict",
+            maxAge: 60 * 60 * 24 * 7,
+            secure: true
+        });
+        return {
+            success: "User signed in successfully",
+            data: session.$id
+        }
+    } catch (err) {
+        const { error, message } = handleError(err, "Failed to sign in user");
+        return {
+            error: error,
+            message: message
+        }
     }
 }

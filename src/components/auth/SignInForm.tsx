@@ -13,6 +13,9 @@ import { FormError } from '@/components/shared/FormError';
 import { FormSuccess } from '@/components/shared/FormSucess';
 import { toast } from '@/hooks/use-toast';
 import { LoginSchema } from '@/schema/auth';
+import { signInUser } from '@/lib/actions/user.actions';
+import { handleError } from '@/lib/utils';
+import { LoaderCircle } from 'lucide-react';
 // import { FcGoogle } from "react-icons/fc";
 // import { FaGithub } from "react-icons/fa";
 // import SocialAuth from './socialauth';
@@ -33,39 +36,52 @@ export const SignInForm = () => {
     })
 
     const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-        setError("")
-        setSuccess("")
-        // startTransition(() => {
-        //     login(values)
-        //         .then((data) => {
-        //             setError(data.error);
-        //             setSuccess(data.success);
-        //             if (data?.error) {
-        //                 toast({
-        //                     title: "Login Failed",
-        //                     description: data.error,
-        //                     duration: 2000,
-        //                     action: (
-        //                         <ToastAction altText="Dismiss" >Dismiss</ToastAction>
-        //                     )
-        //                 })
-        //                 form.reset();
-        //             }
+        setError("");
+        setSuccess("");
+        startTransition(() => {
+            signInUser(values)
+                .then((data) => {
+                    setError(data?.error as string);
+                    setSuccess(data?.success);
+                    if (data?.error) {
+                        toast({
+                            title: "Login Failed",
+                            description: data.message,
+                            variant: "destructive",
+                            duration: 2000,
+                            action: (
+                                <ToastAction altText="Dismiss" >Dismiss</ToastAction>
+                            )
+                        })
+                    }
 
-        //             if (data?.success) {
-        //                 form.reset();
-        //                 toast({
-        //                     title: "Login Success",
-        //                     description: data.message,
-        //                     duration: 2000,
-        //                     action: (
-        //                         <ToastAction altText="Close">Close</ToastAction>
-        //                     ),
-        //                 })
-        //                 router.push("/user/profile/edit");
-        //             }
-        //         })
-        // });
+                    if (data?.success) {
+                        toast({
+                            title: "Login Success",
+                            description: data.success,
+                            duration: 1000,
+                            action: (
+                                <ToastAction altText="Close">Close</ToastAction>
+                            ),
+                        });
+                    }
+                })
+                .catch((err) => {
+                    const { error, message } = handleError(err, "Failed to sign in user");
+                    toast({
+                        title: (error as string),
+                        description: (message as string),
+                        variant: "destructive",
+                        duration: 1000,
+                        action: (
+                            <ToastAction altText="Dismiss" >Dismiss</ToastAction>
+                        )
+                    })
+                })
+                .finally(() => {
+                    form.reset();
+                });
+        });
     }
 
     return (
@@ -133,9 +149,13 @@ export const SignInForm = () => {
                     <FormSuccess message={success} />
 
                     <Button
-                        // disabled={isPending}
+                        disabled={isPending}
                         type="submit" className='primary-btn'>
-                        Login
+                        {
+                            isPending ?
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                : "SignIn"
+                        }
                         <BottomGradient />
                     </Button>
 
