@@ -1,7 +1,7 @@
 import Header from '@/components/navigation/Header';
 import MobileNav from '@/components/navigation/MobileNav';
 import SideBar from '@/components/navigation/SideBar';
-import { getCurrentUser, registerUser } from '@/lib/actions/user.actions';
+import { getCurrentUser } from '@/lib/actions/user.actions';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import React, { ReactNode } from 'react'
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const RootLayout = async ({ children }: { children: ReactNode }) => {
   const currentUser = await getCurrentUser();
   
-  if (!currentUser) return redirect("/sign-in");
+  if (!currentUser) return null;
 
   return (
     <main className='flex h-screen font-poppins'>

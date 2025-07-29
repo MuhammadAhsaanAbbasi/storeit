@@ -7,17 +7,17 @@ import { cookies } from "next/headers";
 
 export const createSessionClient = async () => {
     const client = new Client()
-    .setEndpoint(appWriteConfig.endpoint)
-    .setProject(appWriteConfig.projectID)
+        .setEndpoint(appWriteConfig.endpoint)
+        .setProject(appWriteConfig.projectID)
 
     const session = (await cookies()).get("appwrite-session")
 
-    if(!session || !session.value) throw new Error("Unauthorized")
+    if (!session || !session.value) throw new Error("Unauthorized")
 
-    client.setSession(session.value)
+    client.setSession(session.value);
 
     return {
-        get account()  {
+        get account() {
             return new Account(client)
         },
         get databases() {
@@ -28,12 +28,12 @@ export const createSessionClient = async () => {
 
 export const createAdminClient = async () => {
     const client = new Client()
-    .setEndpoint(appWriteConfig.endpoint)
-    .setProject(appWriteConfig.projectID)
-    .setKey(appWriteConfig.secretKey);
+        .setEndpoint(appWriteConfig.endpoint)
+        .setProject(appWriteConfig.projectID)
+        .setKey(appWriteConfig.secretKey);
 
     return {
-        get account()  {
+        get account() {
             return new Account(client)
         },
         get databases() {
