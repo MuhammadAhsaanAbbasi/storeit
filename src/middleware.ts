@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
     const isPrivateRoute = privateRoutes.includes(nextUrl.pathname);
     const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-    const isLoggedIn = false;
+    const isLoggedIn = true;
 
     if (isApiAuthRoute) {
         // Do nothing for API auth routes
