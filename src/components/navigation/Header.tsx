@@ -3,12 +3,16 @@ import FileSearch from '@/components/file/FileSearch';
 import FileUploader from '@/components/file/FileUploader';
 import SignOutButton from '@/components/auth/SignOutButton';
 
-const Header = () => {
+const Header = ({ownerId, accountId}: {ownerId: string, accountId: string}) => {
   return (
     <header className='header'>
       <FileSearch />
       <div className='header-wrapper'>
-        <FileUploader />
+        <FileUploader
+          className=''
+          ownerId={ownerId}
+          accountId={accountId}
+        />
         <SignOutButton />
       </div>
     </header>

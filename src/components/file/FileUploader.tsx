@@ -5,17 +5,81 @@ import { Button } from '../ui/button'
 import Image from 'next/image'
 import { cn, convertFileToUrl, getFileIcon, getFileType } from '@/lib/utils'
 import Thumbnail from './Thumbnail'
+import { MAX_FILE_SIZE } from '@/constants'
+import { toast } from '@/hooks/use-toast'
+import { uploadFile } from '@/lib/actions/files.actions'
+import { usePathname } from 'next/navigation'
 
 
 interface IProps {
     className: string;
+    ownerId: string;
+    accountId: string;
 }
 
-const FileUploader = ({ className }: IProps) => {
+const FileUploader = ({ className, ownerId, accountId }: IProps) => {
     const [files, setFiles] = useState<File[]>([]);
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        setFiles(acceptedFiles);
-    }, [])
+    const path = usePathname();
+    const onDrop = useCallback(
+        async (acceptedFiles: File[]) => {
+            setFiles(acceptedFiles);
+            const uploadPromises = acceptedFiles.map((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    setFiles((prev) => prev.filter((file) => file.name !== file.name))
+                    toast({
+                        title: "File too large",
+                        description: (
+                            <p className="body-2 text-white">
+                                <span className="font-semibold">
+                                    {file.name}
+                                </span>
+                                <span>
+                                    {" "} is too large.
+                                    Max file size is 50MB.
+                                </span>
+                            </p>
+                        ),
+                        variant: "destructive",
+                    })
+                }
+                return uploadFile({ file, ownerId, accountId, path })
+                    .then((data) => {
+                        if (data.error) {
+                            toast({
+                                title: "Upload Failed!!",
+                                description: (
+                                    <p className="body-2 text-white">
+                                        <span className="font-semibold">
+                                            {file.name}
+                                        </span>
+                                        <span>
+                                            {" "} {data.message}
+                                        </span>
+                                    </p>
+                                ),
+                                variant: "destructive",
+                            });
+                        }
+                        if (data.success) {
+                            setFiles((prevFiles) =>
+                                prevFiles.filter((f) => f.name !== file.name),
+                            );
+                            toast({
+                                title: "Upload Success!!",
+                                description: (
+                                    <p className="body-2 text-white">
+                                        <span className="font-semibold">
+                                            {data.success}
+                                        </span>
+                                    </p>
+                                ),
+                                variant: "default",
+                            });
+                        }
+                    });
+            });
+            await Promise.all(uploadPromises);
+        }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
     const handleRemoveFile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, fileName: string) => {
@@ -65,7 +129,7 @@ const FileUploader = ({ className }: IProps) => {
                                             </div>
                                         </div>
                                         <div className='cursor-pointer'
-                                        onClick={(e) => handleRemoveFile(e, file.name)}
+                                            onClick={(e) => handleRemoveFile(e, file.name)}
                                         >
                                             <Image
                                                 src={"/icons/remove.svg"}

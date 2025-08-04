@@ -18,7 +18,12 @@ import { usePathname } from 'next/navigation';
 import FileUploader from '@/components/file/FileUploader';
 import SignOutButton from '@/components/auth/SignOutButton';
 
-const MobileNav = ({ fullName, email, avatar }: UserProfileProps) => {
+const MobileNav = ({   
+  $id: ownerId,
+  accountId,
+  fullName,
+  avatar,
+  email, }: UserProfileProps) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   return (
@@ -83,7 +88,7 @@ const MobileNav = ({ fullName, email, avatar }: UserProfileProps) => {
               ))}
             </ul>
           <div className="flex flex-col justify-between gap-5 pb-5">
-            <FileUploader />
+            <FileUploader className='w-full' ownerId={ownerId} accountId={accountId} />
             <SignOutButton />
           </div>
           </nav>

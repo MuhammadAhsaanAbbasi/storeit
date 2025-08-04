@@ -20,7 +20,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
     <main className='flex h-screen font-poppins'>
       <SideBar {...currentUser}  />
       <section className='flex h-full flex-1 flex-col'>
-        <Header />
+        <Header ownerId={currentUser.$id} accountId={currentUser.accountId} />
         <MobileNav {...currentUser} />
         <div className='main-content'>
           {children}

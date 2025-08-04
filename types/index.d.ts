@@ -78,6 +78,8 @@ declare interface ShareInputProps {
 }
 
 interface UserProfileProps {
+  $id: string;
+  accountId: string;
   fullName: string;
   avatar: string;
   email: string;
