@@ -3,9 +3,10 @@
 import { createAdminClient } from "../appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appWriteConfig } from "../appwrite/config";
-import { ID } from "node-appwrite";
+import { ID, Models, Query } from "node-appwrite";
 import { constructFileUrl, getFileType, handleError } from "../utils";
 import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "./user.actions";
 
 interface FileUploadProps {
     file: File;
@@ -46,7 +47,10 @@ export const uploadFile = async ({file, ownerId, accountId, path}: FileUploadPro
             fileDocument
         ).catch(async (error) => {
             await storage.deleteFile(appWriteConfig.bucketID, bucketFile.$id);
-            return handleError(error, "Failed to create Document");
+            return {
+                error: handleError(error, "Failed to create Document"),
+                message: "Failed to create Document"
+            }
         });
 
         console.log("bucketFile", bucketFile);
@@ -66,5 +70,46 @@ export const uploadFile = async ({file, ownerId, accountId, path}: FileUploadPro
             return { error: error.message, message: "Failed to upload file" };
           }
           return { error: error, message: "Failed to upload file" }
+    }
+}
+
+const createQueries = (currentUser: Models.Document, types: string[]) => {
+    const queries = [
+        Query.or([
+            Query.equal("owner", [currentUser.$id]),
+            Query.contains("users", [currentUser.email]),
+          ]),
+    ]
+    if (types.length > 0) queries.push(Query.equal("type", types));
+    return queries;
+}
+
+
+export const getFiles = async ({ types }: { types: string[] }) => {
+    const { databases } = await createAdminClient();
+    try {
+        const currentUser = await getCurrentUser();
+
+        if(!currentUser) {
+            return {
+                error: "User not found"
+            }
+        }
+
+        const queries = createQueries(currentUser, types);
+
+        const files = await databases.listDocuments(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            queries
+        );
+
+        // console.log("files", files);
+
+        return {
+            data: files
+        }
+    } catch (error) {
+        handleError(error, "Failed to get files");
     }
 }
