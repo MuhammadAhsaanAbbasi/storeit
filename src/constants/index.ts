@@ -29,27 +29,27 @@ export const navItems = [
 export const actionsDropdownItems = [
   {
     label: "Rename",
-    icon: "/assets/icons/edit.svg",
+    icon: "/icons/edit.svg",
     value: "rename",
   },
   {
     label: "Details",
-    icon: "/assets/icons/info.svg",
+    icon: "/icons/info.svg",
     value: "details",
   },
   {
     label: "Share",
-    icon: "/assets/icons/share.svg",
+    icon: "/icons/share.svg",
     value: "share",
   },
   {
     label: "Download",
-    icon: "/assets/icons/download.svg",
+    icon: "/icons/download.svg",
     value: "download",
   },
   {
     label: "Delete",
-    icon: "/assets/icons/delete.svg",
+    icon: "/icons/delete.svg",
     value: "delete",
   },
 ];

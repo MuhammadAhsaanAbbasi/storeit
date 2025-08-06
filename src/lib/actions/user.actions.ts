@@ -129,6 +129,8 @@ export const getCurrentUser = async () => {
       );
   
       if (user.total <= 0) return null;
+
+    //   console.log(user.documents[0].$id);
   
       return parseStringify(user.documents[0]);
     } catch (error) {

@@ -30,7 +30,6 @@ declare interface GetFilesProps {
 declare interface RenameFileProps {
   fileId: string;
   name: string;
-  extension: string;
   path: string;
 }
 declare interface UpdateFileUsersProps {

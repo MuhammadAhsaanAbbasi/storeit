@@ -15,8 +15,8 @@ interface FileUploadProps {
     path: string;
 }
 
-export const uploadFile = async ({file, ownerId, accountId, path}: FileUploadProps) => {
-    const {storage, databases} = await createAdminClient();
+export const uploadFile = async ({ file, ownerId, accountId, path }: FileUploadProps) => {
+    const { storage, databases } = await createAdminClient();
     try {
         const inputFile = InputFile.fromBuffer(file, file.name);
 
@@ -57,7 +57,7 @@ export const uploadFile = async ({file, ownerId, accountId, path}: FileUploadPro
         console.log("newfile", newfile);
 
         revalidatePath(path);
-        
+
         return {
             success: "File uploaded successfully",
             data: {
@@ -68,21 +68,23 @@ export const uploadFile = async ({file, ownerId, accountId, path}: FileUploadPro
     } catch (error) {
         if (error instanceof Error) {
             return { error: error.message, message: "Failed to upload file" };
-          }
-          return { error: error, message: "Failed to upload file" }
+        }
+        return { error: error, message: "Failed to upload file" }
     }
 }
 
 const createQueries = (currentUser: Models.Document, types: string[]) => {
-    const queries = [
-        Query.or([
-            Query.equal("owner", [currentUser.$id]),
-            Query.contains("users", [currentUser.email]),
-          ]),
-    ]
+    // match if I’m the owner…
+    const ownerQ = Query.equal("owner", currentUser.$id);
+    // …or if my email is in the users array
+    const sharedQ = Query.contains("users", currentUser.email);
+
+    const queries = [Query.or([ownerQ, sharedQ])];
+
     if (types.length > 0) queries.push(Query.equal("type", types));
+
     return queries;
-}
+};
 
 
 export const getFiles = async ({ types }: { types: string[] }) => {
@@ -90,13 +92,15 @@ export const getFiles = async ({ types }: { types: string[] }) => {
     try {
         const currentUser = await getCurrentUser();
 
-        if(!currentUser) {
+        if (!currentUser) {
             return {
                 error: "User not found"
             }
         }
 
         const queries = createQueries(currentUser, types);
+
+        // console.log("queries", queries);
 
         const files = await databases.listDocuments(
             appWriteConfig.databaseID,
@@ -109,7 +113,80 @@ export const getFiles = async ({ types }: { types: string[] }) => {
         return {
             data: files
         }
-    } catch (error) {
-        handleError(error, "Failed to get files");
+    } catch (err) {
+        return {
+            error: handleError(err, "Failed to get files")
+        }
+    }
+}
+
+
+export const renameFile = async ({ fileId, name, path }: RenameFileProps) => {
+    const { databases } = await createAdminClient();
+    try {
+        const file = await databases.updateDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            fileId,
+            {
+                name,
+            }
+        );
+        revalidatePath(path);
+        return {
+            success: "File renamed successfully",
+            data: file
+        }
+    } catch (err) {
+        return {
+            error: handleError(err, "Failed to rename file")
+        }
+    }
+}
+
+
+export const updateFileUsers = async ({ fileId, emails, path }: UpdateFileUsersProps) => {
+    const { databases } = await createAdminClient();
+    try {
+
+        // 3) update
+        const file = await databases.updateDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            fileId,
+            { users: emails }
+        );
+        revalidatePath(path);
+        return {
+            success: "File users updated successfully",
+            data: file
+        }
+    } catch (err) {
+        return {
+            error: handleError(err, "Failed to update file users")
+        }
+    }
+}
+
+export const deleteFile = async ({ fileId, bucketFileId, path }: DeleteFileProps) => {
+    const { databases, storage } = await createAdminClient();
+    try {
+        const deletedFile = await databases.deleteDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            fileId
+        );
+
+        if (deletedFile) {
+            await storage.deleteFile(appWriteConfig.bucketID, bucketFileId);
+        }
+        revalidatePath(path);
+        return {
+            success: "File deleted successfully",
+        }
+    } catch (err) {
+        return {
+            error: handleError(err, "Failed to delete file")
+        }
     }
 }
