@@ -1,6 +1,6 @@
 "use server";
 
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appWriteConfig } from "../appwrite/config";
 import { ID, Models, Query } from "node-appwrite";
@@ -73,7 +73,8 @@ export const uploadFile = async ({ file, ownerId, accountId, path }: FileUploadP
     }
 }
 
-const createQueries = (currentUser: Models.Document, types: string[]) => {
+const createQueries = (currentUser: Models.Document, 
+    types: string[], searchText?: string, sort?: string, limit?: number) => {
     // match if I’m the owner…
     const ownerQ = Query.equal("owner", currentUser.$id);
     // …or if my email is in the users array
@@ -83,11 +84,20 @@ const createQueries = (currentUser: Models.Document, types: string[]) => {
 
     if (types.length > 0) queries.push(Query.equal("type", types));
 
+    if (searchText) queries.push(Query.contains("name", searchText));
+
+    if (limit) queries.push(Query.limit(limit));
+
+    if(sort) {
+        const [sortBy, order] = sort.split("-");
+        queries.push(order === "asc" ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy));
+    }
+
     return queries;
 };
 
 
-export const getFiles = async ({ types }: { types: string[] }) => {
+export const getFiles = async ({ types, searchText, sort, limit}: GetFilesProps) => {
     const { databases } = await createAdminClient();
     try {
         const currentUser = await getCurrentUser();
@@ -98,7 +108,7 @@ export const getFiles = async ({ types }: { types: string[] }) => {
             }
         }
 
-        const queries = createQueries(currentUser, types);
+        const queries = createQueries(currentUser, types, searchText, sort, limit);
 
         // console.log("queries", queries);
 
@@ -190,3 +200,45 @@ export const deleteFile = async ({ fileId, bucketFileId, path }: DeleteFileProps
         }
     }
 }
+
+// ============================== TOTAL FILE SPACE USED
+export async function getTotalSpaceUsed() {
+    try {
+      const { databases } = await createSessionClient();
+      const currentUser = await getCurrentUser();
+      if (!currentUser) throw new Error("User is not authenticated.");
+  
+      const files = await databases.listDocuments(
+        appWriteConfig.databaseID,
+        appWriteConfig.filesCollectionID,
+        [Query.equal("owner", [currentUser.$id])],
+      );
+  
+      const totalSpace = {
+        image: { size: 0, latestDate: "" },
+        document: { size: 0, latestDate: "" },
+        video: { size: 0, latestDate: "" },
+        audio: { size: 0, latestDate: "" },
+        other: { size: 0, latestDate: "" },
+        used: 0,
+        all: 2 * 1024 * 1024 * 1024 /* 2GB available bucket storage */,
+      };
+  
+      files.documents.forEach((file) => {
+        const fileType = file.type as FileType;
+        totalSpace[fileType].size += file.size;
+        totalSpace.used += file.size;
+  
+        if (
+          !totalSpace[fileType].latestDate ||
+          new Date(file.$updatedAt) > new Date(totalSpace[fileType].latestDate)
+        ) {
+          totalSpace[fileType].latestDate = file.$updatedAt;
+        }
+      });
+  
+      return totalSpace
+    } catch (error) {
+      handleError(error, "Error calculating total space used:, ");
+    }
+  }

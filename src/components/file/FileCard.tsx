@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Models } from 'node-appwrite';
 import React from 'react'
-import Thumbnail from './Thumbnail';
+import Thumbnail from '@/components/shared/Thumbnail';
 import ActionDropDown from './ActionDropDown';
 import { convertFileSize } from '@/lib/utils';
 import FormattedDateTime from './FormattedDateTime';

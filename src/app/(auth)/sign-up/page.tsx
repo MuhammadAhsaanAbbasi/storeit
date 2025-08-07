@@ -1,8 +1,14 @@
 import { SignUpForm } from '@/components/auth/SignUpForm';
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const SignUp = () => {
-  return <SignUpForm />
+  return (
+    <main>
+      <Suspense>
+        <SignUpForm />
+      </Suspense>
+    </main>
+  )
 }
 
 export default SignUp;
