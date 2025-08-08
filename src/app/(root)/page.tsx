@@ -18,7 +18,7 @@ const Home = async () => {
   ]);
 
   // Get usage summary
-  const usageSummary = getUsageSummary(totalSpace);
+  const usageSummary = getUsageSummary((totalSpace as TotalSpaceProps));
 
   return (
     <div className="dashboard-container">

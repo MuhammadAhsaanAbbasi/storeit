@@ -1,49 +1,74 @@
-// middleware.js
-import { NextRequest, NextResponse } from 'next/server';
-import { createSessionClient } from './lib/appwrite';
-import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, privateRoutes } from '../routes';
+// middleware.ts
+import { NextRequest, NextResponse } from "next/server";
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  apiAuthPrefix,
+  authRoutes,
+  privateRoutes,
+} from "../routes/index";
+import { createSessionClient } from "./lib/appwrite";
+import { getCurrentUser } from "./lib/actions/user.actions";
 
-export async function middleware(req: NextRequest) {
-    const { nextUrl } = req;
+const LOGIN_PATH = "/sign-in";
 
-    const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-    const isPrivateRoute = privateRoutes.includes(nextUrl.pathname);
-    const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+export default async function middleware(req: NextRequest) {
+  const { nextUrl, cookies } = req;
 
-    const isLoggedIn = true;
+  // 1) Skip API auth routes
+  if (nextUrl.pathname.startsWith(apiAuthPrefix)) {
+    return null;
+  }
 
-    if (isApiAuthRoute) {
-        // Do nothing for API auth routes
-        return;
+  // 2) Auth / Public checks
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isProtectedRoute = privateRoutes.includes(nextUrl.pathname);
+
+  const response = NextResponse.next();
+
+  // 3) Appwrite session cookie (supports both names)
+  // const hasAppwriteCookie = Boolean(cookies.get("appwrite-session"));
+  const user = await getCurrentUser();
+
+  const isLoggedIn = !!user?.data;
+
+  console.log("isLoggedIn", isLoggedIn);
+  console.log("isAuthRoute", isAuthRoute);
+  console.log("isProtectedRoute", isProtectedRoute);
+
+  // 4) If logged in and visiting auth pages -> send to app
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, req.url));
+    }
+    return null;
+  }
+
+  // 5) If NOT logged in and route is protected -> send to sign-in with a single safe callback
+  if (!isLoggedIn && isProtectedRoute) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
     }
 
-    // Redirect logged-in users away from /sign-in or /sign-up
-    if (isLoggedIn && isAuthRoute) {
-        return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, req.url));
-    }
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
 
-    // Redirect unauthenticated users to /sign-in
-    if (!isLoggedIn && isPrivateRoute) {
-        const callback = encodeURIComponent(req.nextUrl.pathname + req.nextUrl.search);
-        return NextResponse.redirect(
-            new URL(`/sign-in?callbackUrl=${callback}`, req.url)
-        );
-    }
+    return NextResponse.redirect(
+      new URL(`/sign-in?callbackUrl=${encodedCallbackUrl}`, nextUrl)
+    );
+  }
 
-    // Allow access to public routes or logged-in users
-    return;
+  // 6) Otherwise allow
+  return response;
 }
 
-// Optionally, don't invoke Middleware on some paths
+// Only allow same-origin paths and avoid loops to auth pages
+function safeCallback(cb: string) {
+  if (!cb || !cb.startsWith("/")) return "/";
+  if (cb.startsWith("/sign-in") || cb.startsWith("/sign-up") || cb.startsWith("/error"))
+    return "/";
+  return cb;
+}
+
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-         */
-        '/((?!api|_next/static|favicon.ico).*)',
-    ],
-}
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+};

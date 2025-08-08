@@ -108,7 +108,7 @@ export const getFiles = async ({ types, searchText, sort, limit}: GetFilesProps)
             }
         }
 
-        const queries = createQueries(currentUser, types, searchText, sort, limit);
+        const queries = createQueries((currentUser.data as Models.Document), types, searchText, sort, limit);
 
         // console.log("queries", queries);
 
@@ -207,11 +207,13 @@ export async function getTotalSpaceUsed() {
       const { databases } = await createSessionClient();
       const currentUser = await getCurrentUser();
       if (!currentUser) throw new Error("User is not authenticated.");
+
+      const user = currentUser.data as Models.Document;
   
       const files = await databases.listDocuments(
         appWriteConfig.databaseID,
         appWriteConfig.filesCollectionID,
-        [Query.equal("owner", [currentUser.$id])],
+        [Query.equal("owner", [user.$id])],
       );
   
       const totalSpace = {

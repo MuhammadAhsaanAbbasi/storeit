@@ -74,7 +74,8 @@ const SideBar = ({ fullName, email, avatar }: UserProfileProps) => {
       />
 
       {/* Account */}
-      <div className='sidebar-user-info'>
+      <div className='sidebar-user-info cursor-pointer'
+      >
         <div className="flex h-12 w-12 shrink-0 overflow-hidden rounded-full">
           <Image
             src={avatar}
@@ -94,7 +95,7 @@ const SideBar = ({ fullName, email, avatar }: UserProfileProps) => {
           </p>
         </div>
       </div>
-    </aside>
+    </aside >
   )
 }
 

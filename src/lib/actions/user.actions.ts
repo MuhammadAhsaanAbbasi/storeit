@@ -3,7 +3,7 @@ import { appWriteConfig } from "@/lib/appwrite/config";
 import { LoginSchema, RegisterSchema } from "@/schema/auth";
 import { z } from "zod";
 import { createAdminClient, createSessionClient } from "../appwrite";
-import { Query, ID } from "node-appwrite";
+import { Query, ID, Models } from "node-appwrite";
 import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
@@ -132,9 +132,13 @@ export const getCurrentUser = async () => {
 
     //   console.log(user.documents[0].$id);
   
-      return parseStringify(user.documents[0]);
-    } catch (error) {
-      handleError(error, "Unable to load user Profile")
+      return {
+        data: user.documents[0]
+      };
+    } catch (err) {
+      return {
+        error: handleError(err, "Unable to load user Profile")
+      }
     }
   };
 
