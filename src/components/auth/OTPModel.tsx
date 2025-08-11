@@ -57,7 +57,7 @@ const OTPModel = ({ accountId }: { accountId: string }) => {
     }
 
     const resendOTP = async () => {
-        await sendEmailOTP(email).then((data) => {
+        await sendEmailOTP(accountId, email).then((data) => {
             if (data) {
                 toast({
                     title: "Resend OTP",

@@ -8,6 +8,7 @@ import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const getUserByEmail = async (email: string) => {
     const { databases } = await createAdminClient();
@@ -157,7 +158,7 @@ export const signOut = async () => {
     }
 }
 
-export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
+export const signInUser = async (values: z.infer<typeof LoginSchema>, path: string, callbackUrl: string) => {
     const isValidate = LoginSchema.safeParse(values)
 
     if (!isValidate.success) {
@@ -187,6 +188,10 @@ export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
             maxAge: 60 * 60 * 24 * 7,
             secure: true
         });
+        revalidatePath(path);
+
+        // redirect(callbackUrl);
+
         return {
             success: "User signed in successfully",
             data: session.$id

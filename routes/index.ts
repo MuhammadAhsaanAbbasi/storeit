@@ -5,7 +5,10 @@
  */
 export const privateRoutes = [
     "/",
-    "/:**" // Dynamic File Routes
+    "/documents",
+    "/images",
+    "/media",
+    "/others",
 ];
 
 /**

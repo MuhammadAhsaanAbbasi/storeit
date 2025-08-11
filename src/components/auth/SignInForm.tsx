@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Button } from '../ui/button';
-import { useRouter } from 'next/navigation';
+import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ToastAction } from '../ui/toast';
 import { FormError } from '@/components/shared/FormError';
 import { FormSuccess } from '@/components/shared/FormSucess';
@@ -19,13 +19,17 @@ import { LoaderCircle } from 'lucide-react';
 // import { FcGoogle } from "react-icons/fc";
 // import { FaGithub } from "react-icons/fa";
 // import SocialAuth from './socialauth';
-// import { login } from '@/global-actions/auth';
 
 export const SignInForm = () => {
-    const [error, setError] = useState<string | undefined>("")
-    const [success, setSuccess] = useState<string | undefined>("")
-    const [isPending, startTransition] = useTransition()
-    const router = useRouter()
+    const [error, setError] = useState<string | undefined>("");
+    const [success, setSuccess] = useState<string | undefined>("");
+    const [isPending, startTransition] = useTransition();
+    const path = usePathname();
+    const params = useSearchParams();
+    const router = useRouter();
+
+    const callbackUrl = params.get("callbackUrl") as string;
+    console.log(`callbackUrl: ${callbackUrl}`);
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -39,7 +43,7 @@ export const SignInForm = () => {
         setError("");
         setSuccess("");
         startTransition(() => {
-            signInUser(values)
+            signInUser(values, path, callbackUrl)
                 .then((data) => {
                     setError(data?.error as string);
                     setSuccess(data?.success);
@@ -56,6 +60,7 @@ export const SignInForm = () => {
                     }
 
                     if (data?.success) {
+                        router.push(callbackUrl);
                         toast({
                             title: "Login Success",
                             description: data.success,
