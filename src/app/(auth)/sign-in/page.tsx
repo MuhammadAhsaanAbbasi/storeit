@@ -1,9 +1,15 @@
 
 import { SignInForm } from '@/components/auth/SignInForm';
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const SignIn = () => {
-  return <SignInForm />
+  return (
+    <main>
+      <Suspense>
+        <SignInForm />
+      </Suspense>
+    </main>
+  )
 }
 
 export default SignIn;

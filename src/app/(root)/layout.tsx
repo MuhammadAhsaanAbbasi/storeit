@@ -4,13 +4,14 @@ import SideBar from '@/components/navigation/SideBar';
 import { getCurrentUser } from '@/lib/actions/user.actions';
 import { parseStringify } from '@/lib/utils';
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import React, { ReactNode } from 'react'
 
 export const metadata: Metadata = {
   title: "StoreIt",
   description: "StoreIt - The only storage solution you need.",
 };
+
+export const dynamic = 'force-dynamic';
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
   const currentUser = await getCurrentUser();
