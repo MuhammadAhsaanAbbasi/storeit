@@ -158,7 +158,7 @@ export const signOut = async () => {
     }
 }
 
-export const signInUser = async (values: z.infer<typeof LoginSchema>, path: string, callbackUrl: string) => {
+export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
     const isValidate = LoginSchema.safeParse(values)
 
     if (!isValidate.success) {
@@ -188,9 +188,6 @@ export const signInUser = async (values: z.infer<typeof LoginSchema>, path: stri
             maxAge: 60 * 60 * 24 * 7,
             secure: true
         });
-        revalidatePath(path);
-
-        // redirect(callbackUrl);
 
         return {
             success: "User signed in successfully",

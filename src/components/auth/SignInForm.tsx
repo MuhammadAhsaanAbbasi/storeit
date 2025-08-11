@@ -24,11 +24,10 @@ export const SignInForm = () => {
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
-    const path = usePathname();
     const params = useSearchParams();
     const router = useRouter();
 
-    const callbackUrl = params.get("callbackUrl") as string;
+    const callbackUrl = params.get("callbackUrl") as string || "/";
     console.log(`callbackUrl: ${callbackUrl}`);
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -43,7 +42,7 @@ export const SignInForm = () => {
         setError("");
         setSuccess("");
         startTransition(() => {
-            signInUser(values, path, callbackUrl)
+            signInUser(values)
                 .then((data) => {
                     setError(data?.error as string);
                     setSuccess(data?.success);

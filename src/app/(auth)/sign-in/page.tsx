@@ -4,7 +4,7 @@ import React, { Suspense } from 'react'
 
 const SignIn = () => {
   return (
-    <main>
+    <main className='w-full'>
       <Suspense>
         <SignInForm />
       </Suspense>

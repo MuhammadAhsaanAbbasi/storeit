@@ -3,7 +3,7 @@ import React, { Suspense } from 'react'
 
 const SignUp = () => {
   return (
-    <main>
+    <main className='w-full font-poppins'>
       <Suspense>
         <SignUpForm />
       </Suspense>

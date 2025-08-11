@@ -5,10 +5,9 @@ import {
   apiAuthPrefix,
   authRoutes,
   privateRoutes,
-} from "../routes";
+} from "@/lib/routes";
 
 const LOGIN_PATH = "/sign-in";
-const APPWRITE_PROJECT = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!;
 
 export default async function middleware(req: NextRequest) {
   const { nextUrl, cookies } = req;
@@ -30,18 +29,16 @@ export default async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
   // 3) Correct Appwrite cookie names
-  const sessionCookie =
-    cookies.get(`a_session_${APPWRITE_PROJECT}`)?.value ??
-    cookies.get(`a_session_${APPWRITE_PROJECT}_legacy`)?.value;
+  const sessionCookie = Boolean(cookies.get("appwrite-session"));
 
-  const isLoggedIn = Boolean(sessionCookie);
+  const isLoggedIn = !!sessionCookie;
 
   // 4) If logged in and visiting auth pages -> send to app
   if (isAuthRoute) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, req.url));
     }
-    return NextResponse.next();
+    return null;
   }
 
   // 5) If not logged in and protected -> sign-in with safe callback
@@ -57,8 +54,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // official example with favicon/robots/sitemap excluded
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-  ],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/"],
 };

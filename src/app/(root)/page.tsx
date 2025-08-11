@@ -63,29 +63,39 @@ const Home = async () => {
       <section className="dashboard-recent-files">
         <h2 className="h3 xl:h2 text-light-100">Recent files uploaded</h2>
         {(files.data?.documents?.length as number) > 0 ? (
-          <ul className="mt-5 flex flex-col gap-5">
+          <ul className="flex flex-col gap-6">
             {files.data?.documents?.map((file: Models.Document) => (
               <Link
                 href={file.url}
                 target="_blank"
-                className="flex items-center gap-3"
+                className="flex flex-col xl:flex-row gap-3"
                 key={file.$id}
               >
-                <Thumbnail
-                  type={file.type}
-                  extension={file.extension}
-                  url={file.url}
-                />
+                <div className="flex justify-between gap-3">
+
+                  <Thumbnail
+                    type={file.type}
+                    extension={file.extension}
+                    url={file.url}
+                  />
+                  <div className="xl:hidden">
+                    <ActionDropDown file={file} />
+                  </div>
+                </div>
 
                 <div className="recent-file-details">
                   <div className="flex flex-col gap-1">
-                    <p className="recent-file-name">{file.name}</p>
+                    <p className="recent-file-name">
+                      {file.name}
+                    </p>
                     <FormattedDateTime
                       date={file.$createdAt}
                       className="caption"
                     />
                   </div>
-                  <ActionDropDown file={file} />
+                  <div className="hidden xl:block">
+                    <ActionDropDown file={file} />
+                  </div>
                 </div>
               </Link>
             ))}

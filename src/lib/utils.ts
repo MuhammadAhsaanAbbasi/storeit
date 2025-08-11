@@ -189,32 +189,32 @@ export const getUsageSummary = (totalSpace: TotalSpaceProps) => {
   return [
     {
       title: "Documents",
-      size: totalSpace.document.size,
-      latestDate: totalSpace.document.latestDate,
+      size: totalSpace?.document?.size,
+      latestDate: totalSpace?.document?.latestDate,
       icon: "/icons/file-document-light.svg",
       url: "/documents",
     },
     {
       title: "Images",
-      size: totalSpace.image.size,
-      latestDate: totalSpace.image.latestDate,
+      size: totalSpace?.image?.size,
+      latestDate: totalSpace?.image?.latestDate,
       icon: "/icons/file-image-light.svg",
       url: "/images",
     },
     {
       title: "Media",
-      size: totalSpace.video.size + totalSpace.audio.size,
+      size: totalSpace?.video?.size + totalSpace?.audio?.size,
       latestDate:
-        totalSpace.video.latestDate > totalSpace.audio.latestDate
-          ? totalSpace.video.latestDate
-          : totalSpace.audio.latestDate,
+        totalSpace?.video?.latestDate > totalSpace?.audio?.latestDate
+          ? totalSpace?.video?.latestDate
+          : totalSpace?.audio?.latestDate,
       icon: "/icons/file-video-light.svg",
       url: "/media",
     },
     {
       title: "Others",
-      size: totalSpace.other.size,
-      latestDate: totalSpace.other.latestDate,
+      size: totalSpace?.other?.size,
+      latestDate: totalSpace?.other?.latestDate,
       icon: "/icons/file-other-light.svg",
       url: "/others",
     },

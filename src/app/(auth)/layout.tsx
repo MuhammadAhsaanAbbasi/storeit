@@ -18,6 +18,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
             alt='logo'
             width={224}
             height={85}
+            unoptimized={true}
           />
 
           {/* text */}
