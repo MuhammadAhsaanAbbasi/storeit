@@ -12,14 +12,14 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { ToastAction } from '../ui/toast';
 import { FormError } from '@/components/shared/FormError';
 import { FormSuccess } from '@/components/shared/FormSucess';
-// import { FcGoogle } from "react-icons/fc";
-// import { FaGithub } from "react-icons/fa";
-// import SocialAuth from './socialauth';
 import { toast } from '@/hooks/use-toast';
 import { RegisterSchema } from '@/schema/auth';
-import { registerUser } from '@/lib/actions/user.actions';
+import { registerUser, signInWithGithub, signInWithGoogle } from '@/lib/actions/user.actions';
 import { LoaderCircle } from 'lucide-react';
 import OTPModel from './OTPModel';
+import SocialAuth from './socialauth';
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from "react-icons/fa";
 // import { register } from '@/global-actions/auth';
 
 
@@ -185,6 +185,11 @@ export const SignUpForm = () => {
                         </Button>
 
                     </form>
+                    {/* <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" /> */}
+                    <div className="flex items-center justify-center gap-4 my-5">
+                        <SocialAuth text='Google' icon={FcGoogle} onClick={signInWithGoogle} />
+                        <SocialAuth text='Github' icon={FaGithub} onClick={signInWithGithub} />
+                    </div>
                 </CardWrapper>
             </Form>
             {accountId && (

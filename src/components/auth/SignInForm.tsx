@@ -13,12 +13,12 @@ import { FormError } from '@/components/shared/FormError';
 import { FormSuccess } from '@/components/shared/FormSucess';
 import { toast } from '@/hooks/use-toast';
 import { LoginSchema } from '@/schema/auth';
-import { signInUser } from '@/lib/actions/user.actions';
+import { signInUser, signInWithGithub, signInWithGoogle } from '@/lib/actions/user.actions';
 import { handleError } from '@/lib/utils';
 import { LoaderCircle } from 'lucide-react';
-// import { FcGoogle } from "react-icons/fc";
-// import { FaGithub } from "react-icons/fa";
-// import SocialAuth from './socialauth';
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import SocialAuth from './socialauth';
 
 export const SignInForm = () => {
     const [error, setError] = useState<string | undefined>("");
@@ -164,6 +164,10 @@ export const SignInForm = () => {
                     </Button>
 
                 </form>
+                <div className="flex items-center justify-center gap-4 my-5">
+                    <SocialAuth text='Google' icon={FcGoogle} onClick={signInWithGoogle} />
+                    <SocialAuth text='Github' icon={FaGithub} onClick={signInWithGithub} />
+                </div>
             </CardWrapper>
         </FormProvider>
     );

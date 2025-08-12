@@ -8,7 +8,8 @@ import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { OAuthProvider } from "node-appwrite";
 
 const getUserByEmail = async (email: string) => {
     const { databases } = await createAdminClient();
@@ -201,3 +202,32 @@ export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
         }
     }
 }
+
+
+export async function signInWithGithub() {
+	const { account } = await createAdminClient();
+
+  const origin = (await headers()).get("origin");
+  
+	const redirectUrl = await account.createOAuth2Token(
+		OAuthProvider.Github,
+		`${origin}/oauth/github`,
+		`${origin}/signup`,
+	);
+
+	return redirect(redirectUrl);
+};
+
+export async function signInWithGoogle() {
+	const { account } = await createAdminClient();
+
+  const origin = (await headers()).get("origin");
+  
+	const redirectUrl = await account.createOAuth2Token(
+		OAuthProvider.Google,
+		`${origin}/oauth/google`,
+		`${origin}/signup`,
+	);
+
+	return redirect(redirectUrl);
+};

@@ -5,16 +5,17 @@ import { appWriteConfig } from "./config";
 import { cookies } from "next/headers";
 
 
-export const createSessionClient = async () => {
+export const createSessionClient = async (sessionSecret?: string) => {
     const client = new Client()
         .setEndpoint(appWriteConfig.endpoint)
         .setProject(appWriteConfig.projectID)
 
-    const session = (await cookies()).get("appwrite-session")
+    const cookieVal = (await cookies()).get("appwrite-session")?.value;
+    const token = sessionSecret ?? cookieVal;
 
-    if (!session || !session.value) throw new Error("Unauthorized")
+    if (!token) throw new Error("Unauthorized");
 
-    client.setSession(session.value);
+    client.setSession(token);
 
     return {
         get account() {
