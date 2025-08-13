@@ -3,13 +3,25 @@ import { BASE_URL, appWriteConfig } from "@/lib/appwrite/config";
 import { LoginSchema, RegisterSchema } from "@/schema/auth";
 import { z } from "zod";
 import { createAdminClient, createSessionClient } from "../appwrite";
-import { Query, ID, Models } from "node-appwrite";
+import { Query, ID } from "node-appwrite";
 import { handleError, parseStringify } from "../utils";
 import { avatarPlaceholderUrl } from "@/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { OAuthProvider } from "node-appwrite";
+
+export async function getOrigin(): Promise<string> {
+  const env = process.env.NEXT_PUBLIC_BASE_URL!;
+  if (env) return env.replace(/\/$/, ""); // remove trailing slash
+  // fallback to header (useful in dev)
+  const originHeader = (await headers()).get("x-forwarded-proto")
+    ? `${(await headers()).get("x-forwarded-proto")}://${(await headers()).get("host")}`
+    : (await headers()).get("origin");
+  if (originHeader) return originHeader.replace(/\/$/, "");
+  // last resort: throw so you don't send bad redirect to Appwrite
+  throw new Error("Unable to determine origin; set NEXT_PUBLIC_BASE_URL in production.");
+}
 
 const getUserByEmail = async (email: string) => {
     const { databases } = await createAdminClient();
@@ -207,10 +219,12 @@ export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
 export async function signInWithGithub() {
 	const { account } = await createAdminClient();
 
+    const origin = await getOrigin();
+
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Github,
-		`${BASE_URL}/oauth/github`,
-		`${BASE_URL}/signup`,
+		`${origin}/oauth/github`,
+		`${origin}/signup`,
 	);
 
 	return redirect(redirectUrl);
@@ -219,10 +233,12 @@ export async function signInWithGithub() {
 export async function signInWithGoogle() {
 	const { account } = await createAdminClient();
 
+    const origin = await getOrigin();
+
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Google,
-		`${BASE_URL}/oauth/google`,
-		`${BASE_URL}/signup`,
+		`${origin}/oauth/google`,
+		`${origin}/signup`,
 	);
 
 	return redirect(redirectUrl);
