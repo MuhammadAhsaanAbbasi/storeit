@@ -221,6 +221,9 @@ export async function signInWithGithub() {
 
     const origin = await getOrigin();
 
+    console.log("OAuth redirect URL:", `${origin}/oauth/github`);
+
+
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Github,
 		`${origin}/oauth/github`,
@@ -234,6 +237,9 @@ export async function signInWithGoogle() {
 	const { account } = await createAdminClient();
 
     const origin = await getOrigin();
+
+    console.log("OAuth redirect URL:", `${origin}/oauth/google`);
+
 
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Google,
