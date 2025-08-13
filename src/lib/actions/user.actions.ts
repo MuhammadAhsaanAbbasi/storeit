@@ -1,5 +1,5 @@
 "use server";
-import { appWriteConfig } from "@/lib/appwrite/config";
+import { BASE_URL, appWriteConfig } from "@/lib/appwrite/config";
 import { LoginSchema, RegisterSchema } from "@/schema/auth";
 import { z } from "zod";
 import { createAdminClient, createSessionClient } from "../appwrite";
@@ -207,12 +207,10 @@ export const signInUser = async (values: z.infer<typeof LoginSchema>) => {
 export async function signInWithGithub() {
 	const { account } = await createAdminClient();
 
-  const origin = (await headers()).get("origin");
-  
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Github,
-		`${origin}/oauth/github`,
-		`${origin}/signup`,
+		`${BASE_URL}/oauth/github`,
+		`${BASE_URL}/signup`,
 	);
 
 	return redirect(redirectUrl);
@@ -221,12 +219,10 @@ export async function signInWithGithub() {
 export async function signInWithGoogle() {
 	const { account } = await createAdminClient();
 
-  const origin = (await headers()).get("origin");
-  
 	const redirectUrl = await account.createOAuth2Token(
 		OAuthProvider.Google,
-		`${origin}/oauth/google`,
-		`${origin}/signup`,
+		`${BASE_URL}/oauth/google`,
+		`${BASE_URL}/signup`,
 	);
 
 	return redirect(redirectUrl);

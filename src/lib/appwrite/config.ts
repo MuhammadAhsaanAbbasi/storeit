@@ -7,3 +7,5 @@ export const appWriteConfig = {
     bucketID: process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!,
     secretKey: process.env.NEXT_APPWRITE_SECRET_KEY!,
 };
+
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
