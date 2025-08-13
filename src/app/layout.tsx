@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {  Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from "@vercel/analytics/next"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function MainRootLayout({
       >
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
