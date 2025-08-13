@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import React, { ElementType } from 'react'
 import { FcGoogle } from 'react-icons/fc';
 import { Button } from '../ui/button';
@@ -10,18 +10,20 @@ interface IProps {
     onClick: () => void;
 }
 
-const SocialAuth = ({text, icon, onClick}: IProps) => {
+const SocialAuth = ({ text, icon, onClick }: IProps) => {
     return (
-        <Button 
-        className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-dark-100 rounded-md h-10 font-medium shadow-input bg-light-200 hover:bg-light-100 hover:text-light-300 transition-all duration-500"
-        onClick={onClick}
-        >
-            {icon ? React.createElement(icon, { size: 20, className: "text-dark-200" }) : <FcGoogle size={20} />}
-            <span className="text-lg">
-                {text}
-            </span>
-            <BottomGradient />
-        </Button>
+        <form action={onClick} method="POST">
+            <Button
+                className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-dark-100 rounded-md h-10 font-medium shadow-input bg-light-200 hover:bg-light-100 hover:text-light-300 transition-all duration-500"
+            >
+                {icon ? React.createElement(icon, { size: 20, className: "text-dark-200" }) : <FcGoogle size={20} />}
+                <span className="text-lg">
+                    {text}
+                </span>
+                <BottomGradient />
+            </Button>
+
+        </form>
     )
 }
 
