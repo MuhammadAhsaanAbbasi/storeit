@@ -165,7 +165,7 @@ export const updateFileUsers = async ({ fileId, emails, path }: UpdateFileUsersP
             fileId
         );
         const currentUser = await getCurrentUser();
-        const isOwnerId = files.owner == currentUser?.data?.$id;
+        const isOwnerId = files.accountId == currentUser?.data?.accountId;
 
         if (!isOwnerId) {
             return {
@@ -271,7 +271,7 @@ export const getFileOwner = async (fileId: string) => {
             fileId
         );
         const currentUser = await getCurrentUser();
-        const isOwnerId = file.owner == currentUser?.data?.$id;
+        const isOwnerId = file.accountId == currentUser?.data?.accountId;
 
         return {
             data: isOwnerId
