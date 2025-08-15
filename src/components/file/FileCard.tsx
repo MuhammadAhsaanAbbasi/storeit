@@ -1,23 +1,15 @@
-import Link from 'next/link';
 import { Models } from 'node-appwrite';
 import React from 'react'
-import Thumbnail from '@/components/shared/Thumbnail';
 import ActionDropDown from './ActionDropDown';
 import { convertFileSize } from '@/lib/utils';
 import FormattedDateTime from './FormattedDateTime';
+import ImageDialog from './ImageDialog';
 
 const FileCard = ({ file }: { file: Models.Document }) => {
     return (
-        <Link target="_blank" className="file-card" href={file.url}>
+        <div className="file-card">
             <div className="flex justify-between">
-                <Thumbnail
-                    type={file.type}
-                    extension={file.extension}
-                    url={file.url}
-                    className="!size-16"
-                    imageClassName="!size-11"
-                />
-
+                <ImageDialog file={file} />
                 <div className="flex flex-col items-end justify-between">
                     <ActionDropDown file={file} />
                     <p className="body-1">{convertFileSize(file.size)}</p>
@@ -31,7 +23,7 @@ const FileCard = ({ file }: { file: Models.Document }) => {
                     className="body-2 text-light-100"
                 />
             </div>
-        </Link>
+        </div>
     )
 }
 
