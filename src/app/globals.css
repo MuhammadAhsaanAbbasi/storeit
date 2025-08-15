@@ -315,6 +315,9 @@
   .error-message {
     @apply body-2 mx-auto w-fit rounded-xl bg-error/5 px-8 py-4 text-center text-error !important;
   }
+  .auth-social-btn {
+    @apply relative flex space-x-2 items-center justify-start px-4 w-full text-dark-100 rounded-md h-10 font-medium shadow-input bg-light-200 hover:bg-light-100 hover:text-light-300 transition-all duration-500;
+  }
 
   /* Card */
   .file-card {

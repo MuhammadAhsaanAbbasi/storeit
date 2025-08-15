@@ -159,6 +159,22 @@ export const updateFileUsers = async ({ fileId, emails, path }: UpdateFileUsersP
     const { databases } = await createAdminClient();
     try {
 
+        const files = await databases.getDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            fileId
+        );
+        const currentUser = await getCurrentUser();
+        const isOwnerId = files.owner == currentUser?.data?.$id;
+
+        if (!isOwnerId) {
+            return {
+                error: {
+                    message: "You don't have access to update this file"
+                }
+            }
+        }
+
         // 3) update
         const file = await databases.updateDocument(
             appWriteConfig.databaseID,
@@ -244,3 +260,25 @@ export async function getTotalSpaceUsed() {
       handleError(error, "Error calculating total space used:, ");
     }
   }
+
+
+export const getFileOwner = async (fileId: string) => {
+    const { databases } = await createAdminClient();
+    try {
+        const file = await databases.getDocument(
+            appWriteConfig.databaseID,
+            appWriteConfig.filesCollectionID,
+            fileId
+        );
+        const currentUser = await getCurrentUser();
+        const isOwnerId = file.owner == currentUser?.data?.$id;
+
+        return {
+            data: isOwnerId
+        };
+    } catch (err) {
+        return {
+            error: handleError(err, "Failed to get file owner")
+        }
+    }
+}

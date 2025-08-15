@@ -1,9 +1,10 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Models } from 'node-appwrite';
 import { ImageThumbnail } from './FileDetails';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import Image from 'next/image';
+import { getFileOwner } from '@/lib/actions/files.actions';
 
 interface Props {
     file: Models.Document;
@@ -12,6 +13,14 @@ interface Props {
 }
 
 const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
+    const [fileOwner, setFileOwner] = useState<boolean>(false);
+    useEffect(() => {
+        const filedOwner = async () => {
+            const owner = await getFileOwner(file.$id);
+            setFileOwner(owner?.data as boolean);
+        }
+        filedOwner();
+    }, [file.$id])
     return (
         <div>
             <ImageThumbnail file={file} />
@@ -36,30 +45,34 @@ const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
                         </p>
                     </div>
 
-                    <ul className='pt-2'>
-                        {
-                            file.users.map((user: string, index: number) => (
-                                <li
-                                    key={index}
-                                    className="flex items-center justify-between gap-2"
-                                >
-                                    <p className="subtitle-2">{user}</p>
-                                    <Button
-                                        onClick={() => onRemove(user)}
-                                        className="share-remove-user"
-                                    >
-                                        <Image
-                                            src="/icons/remove.svg"
-                                            alt="Remove"
-                                            width={24}
-                                            height={24}
-                                            className="remove-icon"
-                                        />
-                                    </Button>
-                                </li>
-                            ))
-                        }
-                    </ul>
+                    {
+                        fileOwner && (
+                            <ul className='pt-2'>
+                                {
+                                    file.users.map((user: string, index: number) => (
+                                        <li
+                                            key={index}
+                                            className="flex items-center justify-between gap-2"
+                                        >
+                                            <p className="subtitle-2">{user}</p>
+                                            <Button
+                                                onClick={() => onRemove(user)}
+                                                className="share-remove-user"
+                                            >
+                                                <Image
+                                                    src="/icons/remove.svg"
+                                                    alt="Remove"
+                                                    width={24}
+                                                    height={24}
+                                                    className="remove-icon"
+                                                />
+                                            </Button>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        )
+                    }
                 </div>
             </div>
         </div>
